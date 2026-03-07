@@ -59,18 +59,25 @@
     <script>
         async function redirect() {
             const path = window.location.pathname;
-            const shortCode = path.split('/').pop();
+            
+            // Handle both /s/abc123 and /abc123 patterns
+            let shortCode = '';
+            if (path.startsWith('/s/')) {
+                shortCode = path.replace('/s/', '').split('/')[0];
+            } else if (path.startsWith('/') && !path.startsWith('/admin') && !path.startsWith('/login') && !path.startsWith('/signup') && !path.startsWith('/reset-password')) {
+                shortCode = path.replace('/', '').split('/')[0];
+            }
 
-            if (!shortCode) {
+            if (!shortCode || shortCode === '') {
                 showError('Invalid link');
                 return;
             }
 
             try {
-                const response = await fetch(`https://jrvqhvzqcnntwngttedl.supabase.co/functions/v1/redirect/${shortCode}`, {
+                const response = await fetch(`https://your-project-id.supabase.co/functions/v1/redirect/${shortCode}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpydnFodnpxY25udHduZ3R0ZWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4NTU5NjgsImV4cCI6MjA4ODQzMTk2OH0.aC1CwuioKdMtdIw1U3NS69CboRbM4YOryTxUH9CH7pI',
+                        'Authorization': 'Bearer your-anon-key-here',
                     },
                     redirect: 'manual'
                 });
@@ -80,7 +87,7 @@
                     if (location) {
                         window.location.href = location;
                     } else {
-                        window.location.href = `https://jrvqhvzqcnntwngttedl.supabase.co/functions/v1/redirect/${shortCode}`;
+                        window.location.href = `https://your-project-id.supabase.co/functions/v1/redirect/${shortCode}`;
                     }
                 } else if (response.status === 404) {
                     showError('Link not found');
