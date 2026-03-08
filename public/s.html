@@ -57,7 +57,10 @@
     </div>
 
     <script>
-        async function redirect() {
+        const SUPABASE_URL = 'https://jbazoxfooexkhvqvebru.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_odO-J3UbyUo3r2S6Yj6UaQ_-CdjmuVG';
+
+async function redirect() {
             const path = window.location.pathname;
             
             // Handle both /s/abc123 and /abc123 patterns
@@ -74,10 +77,10 @@
             }
 
             try {
-                const response = await fetch(`https://your-project-id.supabase.co/functions/v1/redirect/${shortCode}`, {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/redirect/${shortCode}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': 'Bearer your-anon-key-here',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                     },
                     redirect: 'manual'
                 });
@@ -87,7 +90,7 @@
                     if (location) {
                         window.location.href = location;
                     } else {
-                        window.location.href = `https://your-project-id.supabase.co/functions/v1/redirect/${shortCode}`;
+                        window.location.href = `${SUPABASE_URL}/functions/v1/redirect/${shortCode}`;
                     }
                 } else if (response.status === 404) {
                     showError('Link not found');
