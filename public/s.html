@@ -287,7 +287,18 @@ function getDomain(url) {
             try {
                 // Log click and redirect immediately
                 await logClick(linkData.id);
-                window.location.href = linkData.original_url;
+                
+                // Check if redirecting to same URL to prevent loop
+                const currentUrl = window.location.href;
+                const targetUrl = linkData.original_url;
+                
+                if (currentUrl === targetUrl || currentUrl.includes(targetUrl)) {
+                    console.log('Preventing redirect loop - same URL detected');
+                    showError('Redirect loop detected. Please try again.');
+                    return;
+                }
+                
+                window.location.href = targetUrl;
             } catch (error) {
                 console.error('Failed to redirect:', error);
                 showError('An error occurred');
