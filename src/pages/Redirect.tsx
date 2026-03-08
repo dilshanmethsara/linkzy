@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+const AD_COUNTDOWN_SECONDS = 15;
+
 function getDomain(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www\./, '');
@@ -12,10 +14,10 @@ function getDomain(url: string): string {
 export function Redirect() {
   const [error, setError] = useState<string | null>(null);
   const [link, setLink] = useState<{ id: string; original_url: string } | null>(null);
+  const [countdown, setCountdown] = useState(AD_COUNTDOWN_SECONDS);
   const [redirecting, setRedirecting] = useState(false);
 
-  // Removed ad loading useEffect
-
+  // Removed ad loading useEffect, added countdown useEffect
   useEffect(() => {
     const path = window.location.pathname;
     
@@ -55,10 +57,15 @@ export function Redirect() {
     fetchLink();
   }, []);
 
-  // Removed countdown useEffect for instant redirect
+  // Countdown when link is loaded
+  useEffect(() => {
+    if (!link || countdown <= 0) return;
+    const t = setInterval(() => setCountdown((c) => c - 1), 1000);
+    return () => clearInterval(t);
+  }, [link, countdown]);
 
   const handleContinue = async () => {
-    if (!link || redirecting) return;
+    if (!link || redirecting || countdown > 0) return;
     setRedirecting(true);
 
     await supabase.from('clicks').insert({
@@ -68,8 +75,10 @@ export function Redirect() {
       referrer: document.referrer || null,
     });
 
-    // Instant redirect without delay
-    window.location.replace(link.original_url);
+    // Redirect after countdown reaches 0
+    setTimeout(() => {
+      window.location.replace(link.original_url);
+    }, 1000);
   };
 
   if (error) {
@@ -111,7 +120,7 @@ export function Redirect() {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4 text-white text-center">
-          <h1 className="text-lg sm:text-xl font-semibold">Redirecting...</h1>
+          <h1 className="text-lg sm:text-xl font-semibold">One moment...</h1>
           <p className="text-xs sm:text-sm opacity-90">You're going to</p>
           <p className="font-mono font-bold truncate text-sm sm:text-base" title={link.original_url}>{domain}</p>
         </div>
@@ -120,10 +129,12 @@ export function Redirect() {
           <button
             type="button"
             onClick={handleContinue}
-            disabled={redirecting}
+            disabled={countdown > 0 || redirecting}
             className="w-full py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
           >
-            {redirecting ? 'Redirecting...' : `Continue to ${domain}`}
+            {countdown > 0
+              ? `Continue in ${countdown}s`
+              : `Continue to ${domain}`}
           </button>
           <p className="text-xs text-gray-500 text-center mt-3">
             Click the button above to go to your destination
