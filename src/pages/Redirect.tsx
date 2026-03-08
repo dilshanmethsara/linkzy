@@ -57,16 +57,34 @@ export function Redirect() {
     fetchLink();
   }, []);
 
-  // Countdown when link is loaded
+  // Countdown when link is loaded - simplified approach
   useEffect(() => {
     if (!link || countdown <= 0) return;
+    
     console.log('Starting countdown from:', countdown);
-    const t = setInterval(() => {
-      const newCount = countdown - 1;
-      console.log('Countdown:', newCount);
-      setCountdown(newCount);
-    }, 1000);
-    return () => clearInterval(t);
+    
+    // Use requestAnimationFrame for more reliable timing
+    const startTime = Date.now();
+    const updateCountdown = () => {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, AD_COUNTDOWN_SECONDS - Math.floor(elapsed / 1000));
+      
+      console.log('Elapsed:', elapsed, 'Remaining:', remaining);
+      setCountdown(remaining);
+      
+      if (remaining <= 0) {
+        setCountdown(0);
+        return;
+      }
+      
+      requestAnimationFrame(updateCountdown);
+    };
+    
+    requestAnimationFrame(updateCountdown);
+    
+    return () => {
+      // Cleanup will be handled by component unmount
+    };
   }, [link, countdown]);
 
   const handleContinue = async () => {
