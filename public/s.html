@@ -79,31 +79,32 @@ async function redirect() {
             // Debug info (remove in production)
             console.log('Short code:', shortCode);
             console.log('Supabase URL:', SUPABASE_URL);
-            console.log('Request URL:', `${SUPABASE_URL}/functions/v1/redirect/${shortCode}`);
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/redirect/${shortCode}`, {
+                // Use Supabase REST API directly instead of edge function
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/links?short_code=eq.${shortCode}&select=id,original_url,is_active`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    },
-                    redirect: 'manual'
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json'
+                    }
                 });
 
                 console.log('Response status:', response.status);
-                console.log('Response type:', response.type);
 
-                if (response.status === 302 || response.type === 'opaqueredirect') {
-                    const location = response.headers.get('Location');
-                    if (location) {
-                        window.location.href = location;
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Link data:', data);
+                    
+                    if (data.length > 0 && data[0].is_active) {
+                        // Log click and redirect
+                        await logClick(data[0].id);
+                        window.location.href = data[0].original_url;
+                    } else if (data.length > 0 && !data[0].is_active) {
+                        showError('This link has been deactivated');
                     } else {
-                        window.location.href = `${SUPABASE_URL}/functions/v1/redirect/${shortCode}`;
+                        showError('Link not found');
                     }
-                } else if (response.status === 404) {
-                    showError('Link not found');
-                } else if (response.status === 410) {
-                    showError('This link has been deactivated');
                 } else {
                     console.log('Response text:', await response.text());
                     showError('Failed to redirect');
@@ -111,6 +112,41 @@ async function redirect() {
             } catch (error) {
                 console.error('Redirect error:', error);
                 showError('An error occurred');
+            }
+        }
+
+        async function logClick(linkId) {
+            try {
+                const userAgent = navigator.userAgent;
+                let device = 'desktop';
+                if (/mobile|android|iphone|ipad|ipod/i.test(userAgent)) {
+                    device = 'mobile';
+                } else if (/tablet|ipad/i.test(userAgent)) {
+                    device = 'tablet';
+                }
+
+                let browser = 'Unknown';
+                if (userAgent.includes('Chrome')) browser = 'Chrome';
+                else if (userAgent.includes('Firefox')) browser = 'Firefox';
+                else if (userAgent.includes('Safari')) browser = 'Safari';
+                else if (userAgent.includes('Edge')) browser = 'Edge';
+
+                await fetch(`${SUPABASE_URL}/rest/v1/clicks`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        link_id: linkId,
+                        device,
+                        browser,
+                        referrer: document.referrer || null
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to log click:', error);
             }
         }
 
