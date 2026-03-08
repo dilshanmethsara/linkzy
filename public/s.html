@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .loader {
+            text-align: center;
+            color: white;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            text-align: center;
+        }
+        .error h2 {
+            color: #e53e3e;
+            margin: 0 0 10px;
+        }
+        .error p {
+            color: #4a5568;
+            margin: 0;
+        }
+        .redirect-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+            margin: 20px;
+            overflow: hidden;
+        }
+        .redirect-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .redirect-header h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.5rem;
+        }
+        .redirect-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        .redirect-content {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .ad-container {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .countdown-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .countdown-button:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .countdown-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .countdown-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div id="redirect-container" class="redirect-container" style="display: none;">
+        <div class="redirect-header">
+            <h1>One moment...</h1>
+            <p>You're going to</p>
+            <p id="destination-domain" style="font-family: monospace; font-weight: bold;"></p>
+        </div>
+
+        <div class="redirect-content">
+            <div class="ad-container" id="container-6de4d82ad7e815a02e14f301d6c53094">
+                <!-- Ads will be loaded here -->
+                <div style="color: #6c757d; font-size: 0.9rem;">Loading ads...</div>
+            </div>
+
+            <button id="continue-button" class="countdown-button" onclick="handleContinue()">
+                <span id="button-text">Continue in 15s</span>
+            </button>
+            
+            <p class="countdown-text">Click the button above to go to your destination</p>
+        </div>
+    </div>
+
+    <div id="loading-container" class="loader">
+        <div class="spinner"></div>
+        <p>Redirecting...</p>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://jbazoxfooexkhvqvebru.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_odO-J3UbyUo3r2S6Yj6UaQ_-CdjmuVG';
+
+const AD_COUNTDOWN_SECONDS = 15;
+let countdown = AD_COUNTDOWN_SECONDS;
+let linkData = null;
+
+function getDomain(url) {
+            try {
+                return new URL(url).hostname.replace(/^www\./, '');
+            } catch {
+                return url;
+            }
+        }
+
+        async function loadAds() {
+            // Set up atOptions configuration for High Performance Format
+            window.atOptions = {
+                'key': 'cf3b25aa2bcd37649d9ffc74db6a919e',
+                'format': 'iframe',
+                'height': 60,
+                'width': 468,
+                'params': {}
+            };
+
+            // Create and append the High Performance Format script
+            const script1 = document.createElement('script');
+            script1.src = 'https://www.highperformanceformat.com/cf3b25aa2bcd37649d9ffc74db6a919e/invoke.js';
+            document.body.appendChild(script1);
+
+            // Create and append the second ad script
+            const script2 = document.createElement('script');
+            script2.src = 'https://www.effectivegatecpm.com/q5hz55rxxm?key=167b269c4c525db6802028273f794e2d';
+            document.body.appendChild(script2);
+
+            // Create and append the third ad script with container
+            const script3 = document.createElement('script');
+            script3.async = true;
+            script3.setAttribute('data-cfasync', 'false');
+            script3.src = 'https://pl28864160.effectivegatecpm.com/6de4d82ad7e815a02e14f301d6c53094/invoke.js';
+            
+            const container = document.getElementById('container-6de4d82ad7e815a02e14f301d6c53094');
+            if (container) {
+                container.appendChild(script3);
+            }
+        }
+
+        function updateCountdown() {
+            const button = document.getElementById('continue-button');
+            const buttonText = document.getElementById('button-text');
+            
+            if (button && buttonText) {
+                if (countdown > 0) {
+                    button.disabled = true;
+                    buttonText.textContent = `Continue in ${countdown}s`;
+                } else {
+                    button.disabled = false;
+                    buttonText.textContent = `Continue to ${getDomain(linkData.original_url)}`;
+                }
+            }
+        }
+
+        async function redirect() {
+            const path = window.location.pathname;
+            
+            // Handle both /s/abc123 and /abc123 patterns
+            let shortCode = '';
+            if (path.startsWith('/s/')) {
+                shortCode = path.replace('/s/', '').split('/')[0];
+            } else if (path.startsWith('/') && !path.startsWith('/admin') && !path.startsWith('/login') && !path.startsWith('/signup') && !path.startsWith('/reset-password')) {
+                shortCode = path.replace('/', '').split('/')[0];
+            }
+
+            if (!shortCode || shortCode === '') {
+                showError('Invalid link');
+                return;
+            }
+
+            // Debug info (remove in production)
+            console.log('Short code:', shortCode);
+            console.log('Supabase URL:', SUPABASE_URL);
+
+            try {
+                // Use Supabase REST API directly instead of edge function
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/links?short_code=eq.${shortCode}&select=id,original_url,is_active`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Link data:', data);
+                    
+                    if (data.length > 0 && data[0].is_active) {
+                        linkData = data[0];
+                        
+                        // Show redirect page with ads
+                        document.getElementById('loading-container').style.display = 'none';
+                        document.getElementById('redirect-container').style.display = 'block';
+                        document.getElementById('destination-domain').textContent = getDomain(linkData.original_url);
+                        
+                        // Load ads
+                        loadAds();
+                        
+                        let countdown = AD_COUNTDOWN_SECONDS;
+                        updateCountdown();
+                        
+                        // Small delay to ensure ads are loaded before starting countdown
+                        setTimeout(() => {
+                            const countdownInterval = setInterval(() => {
+                                countdown--;
+                                updateCountdown();
+                                
+                                if (countdown <= 0) {
+                                    clearInterval(countdownInterval);
+                                    updateCountdown();
+                                    // Auto-redirect when countdown reaches 0
+                                    handleContinue();
+                                }
+                            }, 1000);
+                            
+                            updateCountdown();
+                        }, 500); // 500ms delay for ads to load
+                        
+                    } else if (data.length > 0 && !data[0].is_active) {
+                        showError('This link has been deactivated');
+                    } else {
+                        showError('Link not found');
+                    }
+                } else {
+                    console.log('Response text:', await response.text());
+                    showError('Failed to redirect');
+                }
+            } catch (error) {
+                console.error('Redirect error:', error);
+                showError('An error occurred');
+            }
+        }
+
+        async function handleContinue() {
+            if (!linkData) return;
+            
+            try {
+                // Log click and redirect immediately
+                await logClick(linkData.id);
+                
+                // Check if redirecting to same URL to prevent loop
+                const currentUrl = window.location.href;
+                const targetUrl = linkData.original_url;
+                
+                if (currentUrl === targetUrl || currentUrl.includes(targetUrl)) {
+                    console.log('Preventing redirect loop - same URL detected');
+                    showError('Redirect loop detected. Please try again.');
+                    return;
+                }
+                
+                window.location.href = targetUrl;
+            } catch (error) {
+                console.error('Failed to redirect:', error);
+                showError('An error occurred');
+            }
+        }
+
+        async function logClick(linkId) {
+            try {
+                const userAgent = navigator.userAgent;
+                let device = 'desktop';
+                if (/mobile|android|iphone|ipad|ipod/i.test(userAgent)) {
+                    device = 'mobile';
+                } else if (/tablet|ipad/i.test(userAgent)) {
+                    device = 'tablet';
+                }
+
+                let browser = 'Unknown';
+                if (userAgent.includes('Chrome')) browser = 'Chrome';
+                else if (userAgent.includes('Firefox')) browser = 'Firefox';
+                else if (userAgent.includes('Safari')) browser = 'Safari';
+                else if (userAgent.includes('Edge')) browser = 'Edge';
+
+                await fetch(`${SUPABASE_URL}/rest/v1/clicks`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        link_id: linkId,
+                        device,
+                        browser,
+                        referrer: document.referrer || null
+                    })
+                });
+            } catch (error) {
+                console.error('Failed to log click:', error);
+            }
+        }
+
+        function showError(message) {
+            document.body.innerHTML = `
+                <div class="error">
+                    <h2>Oops!</h2>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Start the redirect process
+        redirect();
+    </script>
+</body>
+</html>
