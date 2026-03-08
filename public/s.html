@@ -158,15 +158,26 @@ function getDomain(url) {
         }
 
         async function loadAds() {
-            // Load Adsterra scripts
+            // Set up atOptions configuration for High Performance Format
+            (window as any).atOptions = {
+                'key': 'cf3b25aa2bcd37649d9ffc74db6a919e',
+                'format': 'iframe',
+                'height': 60,
+                'width': 468,
+                'params': {}
+            };
+
+            // Create and append the High Performance Format script
             const script1 = document.createElement('script');
             script1.src = 'https://www.highperformanceformat.com/cf3b25aa2bcd37649d9ffc74db6a919e/invoke.js';
             document.body.appendChild(script1);
 
+            // Create and append the second ad script
             const script2 = document.createElement('script');
             script2.src = 'https://www.effectivegatecpm.com/q5hz55rxxm?key=167b269c4c525db6802028273f794e2d';
             document.body.appendChild(script2);
 
+            // Create and append the third ad script with container
             const script3 = document.createElement('script');
             script3.async = true;
             script3.setAttribute('data-cfasync', 'false');
