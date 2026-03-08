@@ -60,7 +60,12 @@ export function Redirect() {
   // Countdown when link is loaded
   useEffect(() => {
     if (!link || countdown <= 0) return;
-    const t = setInterval(() => setCountdown((c) => c - 1), 1000);
+    console.log('Starting countdown from:', countdown);
+    const t = setInterval(() => {
+      const newCount = countdown - 1;
+      console.log('Countdown:', newCount);
+      setCountdown(newCount);
+    }, 1000);
     return () => clearInterval(t);
   }, [link, countdown]);
 
