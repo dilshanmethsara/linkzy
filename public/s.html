@@ -76,6 +76,11 @@ async function redirect() {
                 return;
             }
 
+            // Debug info (remove in production)
+            console.log('Short code:', shortCode);
+            console.log('Supabase URL:', SUPABASE_URL);
+            console.log('Request URL:', `${SUPABASE_URL}/functions/v1/redirect/${shortCode}`);
+
             try {
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/redirect/${shortCode}`, {
                     method: 'GET',
@@ -84,6 +89,9 @@ async function redirect() {
                     },
                     redirect: 'manual'
                 });
+
+                console.log('Response status:', response.status);
+                console.log('Response type:', response.type);
 
                 if (response.status === 302 || response.type === 'opaqueredirect') {
                     const location = response.headers.get('Location');
@@ -97,6 +105,7 @@ async function redirect() {
                 } else if (response.status === 410) {
                     showError('This link has been deactivated');
                 } else {
+                    console.log('Response text:', await response.text());
                     showError('Failed to redirect');
                 }
             } catch (error) {
