@@ -251,20 +251,25 @@ function getDomain(url) {
                         // Load ads
                         loadAds();
                         
-                        // Start countdown
-                        const countdownInterval = setInterval(() => {
-                            countdown--;
-                            updateCountdown();
-                            
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                            updateCountdown();
-                            // Auto-redirect when countdown reaches 0
-                                handleContinue();
-                            }
-                        }, 1000);
-                        
+                        let countdown = AD_COUNTDOWN_SECONDS;
                         updateCountdown();
+                        
+                        // Small delay to ensure ads are loaded before starting countdown
+                        setTimeout(() => {
+                            const countdownInterval = setInterval(() => {
+                                countdown--;
+                                updateCountdown();
+                                
+                                if (countdown <= 0) {
+                                    clearInterval(countdownInterval);
+                                    updateCountdown();
+                                    // Auto-redirect when countdown reaches 0
+                                    handleContinue();
+                                }
+                            }, 1000);
+                            
+                            updateCountdown();
+                        }, 500); // 500ms delay for ads to load
                         
                     } else if (data.length > 0 && !data[0].is_active) {
                         showError('This link has been deactivated');
