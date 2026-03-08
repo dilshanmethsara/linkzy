@@ -32,7 +32,12 @@ export function Homepage({ onNavigate }: HomepageProps) {
           .from('profiles')
           .select('*', { count: 'exact', head: true });
 
-        // Get total links and recent links
+        // Get total links count
+        const { count: totalLinksCount } = await supabase
+          .from('links')
+          .select('*', { count: 'exact', head: true });
+
+        // Get recent links for display
         const { data: linksData } = await supabase
           .from('links')
           .select('created_at, short_code, original_url')
@@ -44,7 +49,7 @@ export function Homepage({ onNavigate }: HomepageProps) {
           .from('clicks')
           .select('*', { count: 'exact', head: true });
 
-        const totalLinks = linksData?.length || 0;
+        const totalLinks = totalLinksCount || 0;
         const totalClicks = totalClicksCount || 0;
 
         // Calculate active users (users with links in last 7 days)
